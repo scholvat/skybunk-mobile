@@ -155,7 +155,7 @@ export default class FeedView extends React.Component {
       .then(value => {
 
         if (type === 'deletePost') {
-          return api.delete(`/posts/${postId}`, { 'Authorization': 'Bearer ' + value })
+          return api.delete(`/posts/${postId}`)
             .then(() => {
               this.updateState('deletePost', postId);
             })
@@ -167,7 +167,7 @@ export default class FeedView extends React.Component {
           this.updateState('updatePost', data);
         }
 
-        api.put(`/posts/${postId}`, { 'Authorization': 'Bearer ' + value }, data)
+        api.put(`/posts/${postId}`, {}, data)
           .then(() => {
             //this.loadData();
           })
