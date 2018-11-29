@@ -29,7 +29,7 @@ module.exports = {
       if (token) {
         ApiClient.post(
           `/users/${user._id}/notificationToken`,
-          { 'Authorization': 'Bearer ' + authToken },
+          {},
           {notificationToken: token}
         )
         .then(response => {})
