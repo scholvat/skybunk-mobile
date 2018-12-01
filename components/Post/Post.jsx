@@ -25,9 +25,9 @@ export default class Post extends React.Component {
       editing: false,
       image: null,
       pollChoices: [
-        {text: "Choice 1", votes: 43, selected: false},
-        {text: "Choice 2", votes: 5, selected: false},
-        {text: "Choice 3", votes: 18, selected: false}
+        {text: "Choice 1", votes: [], selected: false},
+        {text: "Choice 2", votes: [], selected: false},
+        {text: "Choice 3", votes: [], selected: false}
       ]
     }
   }
@@ -333,7 +333,7 @@ export default class Post extends React.Component {
               onPress={this.onPressPost}
             />
           </CardItem> : null}
-          <Poll choices={this.state.pollChoices}/>
+          <Poll choices={this.state.pollChoices} loggedInUser={this.props.loggedInUser}/>
 
           <CardItem style={styles.postFooter}>
             <View style={styles.footerContainer}>

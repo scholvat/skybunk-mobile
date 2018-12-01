@@ -17,11 +17,11 @@ export default class Poll extends React.Component {
   constructor(props) {
     super(props);
 
-    const totalVotes = props.choices.map(choice => {return choice.votes}).reduce((a, b) => a + b, 0);
+    const totalVotes = props.choices.map(choice => {return choice.votes.length}).reduce((a, b) => a + b, 0);
     this.state = {
       choices : props.choices,
       totalVotes: totalVotes,
-      multiSelect: false
+      multiSelect: true,
     }
   }
 
@@ -55,29 +55,43 @@ export default class Poll extends React.Component {
 
   renderListItem = ({ item }) => {
     var onPress = () => {
-      if(!multiSelect && !item.selected){
-        this.state.choices.map()
-        
-      }else{
-        item.selected = !item.selected;
-        item.selected ? item.votes++ : item.votes--;
-        var choices = ;
-        
-        choices[item.key] = item
-        this.setState({
-          choices: choices,
-          totalVotes: item.selected ? this.state.totalVotes+1 : this.state.totalVotes-1
+      if(!this.state.multiSelect && !item.selected){
+        const isVotedOn = this.state.choices.map(choice =>{
+          return choice.votes.includes(this.props.loggedInUser._id)
         });
+        if(isVotedOn.includes(true)){
+          return;
+        }
       }
+      item.selected = !item.selected;
+      var totalVotes = this.state.totalVotes
+      if(item.selected && !item.votes.includes(this.props.loggedInUser._id)){
+        item.votes.push(this.props.loggedInUser._id)
+        totalVotes++;
+      }else if(!item.selected && item.votes.includes(this.props.loggedInUser._id)){
+        item.votes.splice(item.votes.indexOf(this.props.loggedInUser._id),1)
+        totalVotes--;
+      }
+      var choices = this.state.choices;
+
+      choices[item.key] = item;
+      this.setState({
+        choices: choices,
+        totalVotes: totalVotes
+      });
     }
-    const percentage = (item.votes/this.state.totalVotes*100).toFixed() + '%';
+
+    var percentage = (item.votes.length/this.state.totalVotes*100).toFixed();
+    if(isNaN(percentage)) percentage = '0%'
+    else percentage = percentage + '%'
+
     const color = item.selected ? '#57b947' : '#D3D3D3';
     return (
       <TouchableOpacity onPress={onPress}>
           <View style={styles.choice}>
             <View style={[styles.progressBar, {width: percentage, backgroundColor: color}]}/>
             <Text style={styles.choiceText}>{item.text}</Text>
-            <Text style={styles.choiceText}>({item.votes}) {percentage}</Text>
+            <Text style={styles.choiceText}>({item.votes.length}) {percentage}</Text>
           </View>
       </TouchableOpacity>
     );
