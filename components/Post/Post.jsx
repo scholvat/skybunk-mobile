@@ -5,9 +5,11 @@ import Image from 'react-native-scalable-image';
 import { Body, Card, CardItem, Text, Thumbnail, Button, Icon } from 'native-base';
 import _ from 'lodash';
 import { Font } from "expo";
-import date from 'date-fns';
+import date, { isThisHour } from 'date-fns';
 import Popover from 'react-native-popover-view';
 import {getProfilePicture, getPostPicture} from "../../helpers/imageCache"
+import Poll from '../Poll/Poll';
+
 import CreateResourceModal from '../CreateResourceModal/CreateResourceModal';
 import ApiClient from '../../ApiClient';
 import styles from "./PostStyle";
@@ -22,6 +24,11 @@ export default class Post extends React.Component {
       showEditButtons: false,
       editing: false,
       image: null,
+      pollChoices: [
+        {text: "Choice 1", votes: 43, selected: false},
+        {text: "Choice 2", votes: 5, selected: false},
+        {text: "Choice 3", votes: 18, selected: false}
+      ]
     }
   }
 
@@ -326,6 +333,7 @@ export default class Post extends React.Component {
               onPress={this.onPressPost}
             />
           </CardItem> : null}
+          <Poll choices={this.state.pollChoices}/>
 
           <CardItem style={styles.postFooter}>
             <View style={styles.footerContainer}>

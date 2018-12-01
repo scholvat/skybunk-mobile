@@ -148,5 +148,6 @@ export default (styles = StyleSheet.create({
 	},
 	likedListItem: {
 		padding: 5
-	}
+	},
+	
 }));
