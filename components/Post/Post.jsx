@@ -25,8 +25,8 @@ export default class Post extends React.Component {
       editing: false,
       image: null,
       pollChoices: [
-        {text: "Choice 1", votes: [], selected: false},
-        {text: "Choice 2", votes: [], selected: false},
+        {text: "Choice 1", votes: ["test"], selected: false},
+        {text: "Choice 2", votes: ["test"], selected: false},
         {text: "Choice 3", votes: [], selected: false}
       ]
     }

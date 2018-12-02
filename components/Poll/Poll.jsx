@@ -17,11 +17,11 @@ export default class Poll extends React.Component {
   constructor(props) {
     super(props);
 
-    const totalVotes = props.choices.map(choice => {return choice.votes.length}).reduce((a, b) => a + b, 0);
+    const totalVotes = props.choices.reduce((a, b) => ({votes: a.votes.concat(b.votes)})).votes.length;
     this.state = {
       choices : props.choices,
       totalVotes: totalVotes,
-      multiSelect: true,
+      multiSelect: false,
     }
   }
 
@@ -56,19 +56,20 @@ export default class Poll extends React.Component {
   renderListItem = ({ item }) => {
     var onPress = () => {
       if(!this.state.multiSelect && !item.selected){
-        const isVotedOn = this.state.choices.map(choice =>{
-          return choice.votes.includes(this.props.loggedInUser._id)
-        });
-        if(isVotedOn.includes(true)){
-          return;
-        }
+        //Figure out if the user has already voted
+        const hasVoted = this.state.choices
+          .reduce((a, b) => ({votes: a.votes.concat(b.votes)}))
+          .votes.includes(this.props.loggedInUser._id)
+        if(hasVoted) return;
       }
       item.selected = !item.selected;
       var totalVotes = this.state.totalVotes
       if(item.selected && !item.votes.includes(this.props.loggedInUser._id)){
+        //user selected a choice
         item.votes.push(this.props.loggedInUser._id)
         totalVotes++;
       }else if(!item.selected && item.votes.includes(this.props.loggedInUser._id)){
+        //user deselected a choice
         item.votes.splice(item.votes.indexOf(this.props.loggedInUser._id),1)
         totalVotes--;
       }
