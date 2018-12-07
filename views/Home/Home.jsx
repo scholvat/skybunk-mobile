@@ -19,7 +19,6 @@ export default class HomeView extends React.Component {
       loading: true,
       channels: [],
       user: props.navigation.getParam('user'),
-      token: props.navigation.getParam('token'),
       notifications: props.navigation.getParam('user').notifications,
       currentTab: 'channels'
     }
@@ -37,8 +36,7 @@ export default class HomeView extends React.Component {
 
   handleNewNotification = () => {
     api.get(
-      '/users/loggedInUser',
-      { Authorization: `Bearer ${this.state.token}`}
+      '/users/loggedInUser'
     )
     .then(user => {
       if (user._id) {
@@ -71,9 +69,7 @@ export default class HomeView extends React.Component {
 
   updateNotificationState = (notif) => {
     api.post(
-      `/notifications/${notif._id}/markSeen`,
-      { Authorization: `Bearer ${this.state.token}`},
-      {}
+      `/notifications/${notif._id}/markSeen`
     ).catch(err => console.error(err));
 
     this.setState({
@@ -97,9 +93,7 @@ export default class HomeView extends React.Component {
 
   markNotifsSeen = () => {
     api.post(
-      `/users/${this.state.user._id}/markNotifsSeen`,
-      { Authorization: `Bearer ${this.state.token}`},
-      {}
+      `/users/${this.state.user._id}/markNotifsSeen`
     )
     .then(res => {
       this.setState({
@@ -113,7 +107,7 @@ export default class HomeView extends React.Component {
   }
 
   render() {
-    const { channels, loading, user, token } = this.state;
+    const { channels, loading, user} = this.state;
 
     if (loading) {
       return (
@@ -128,13 +122,12 @@ export default class HomeView extends React.Component {
         <Container>
           <Content>
             <ScrollView>
-              <ProfileHeader user={user} token={token} navigation={this.props.navigation}/>
+              <ProfileHeader user={user} navigation={this.props.navigation}/>
               {this.state.currentTab === 'channels' ? 
                 <ChannelList
                   channels={channels}
                   onPressChannel={this.onPressChannel}
                   user={user}
-                  token={token}
                 /> :
               <View>
                 <TouchableOpacity style={style.markAllSeen} onPress={this.markNotifsSeen}>
