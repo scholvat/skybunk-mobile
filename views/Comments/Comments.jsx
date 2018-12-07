@@ -154,31 +154,31 @@ export default class CommentsView extends React.Component {
               this.setState({ postData: updatedPost });
               updateParentState('updatePost', updatedPost);
             })
-          };
-          this.setState({ postData: updatedPost });
-          updateParentState('updatePost', updatedPost);
-        })
-        .catch(err => {
-          alert("Error updating comment. Sorry about that!");
-        });
-    }
+            .catch(err => {
+              alert("Error updating comment. Sorry about that!");
+            });
+        }
 
-    else if (type === 'deleteComment') {
-      api.delete(`/posts/${postData._id}/comment/${id}`)
-        .then(() => {
-          var updatedPost = {
-            ...postData,
-            comments: postData.comments.filter(comments => {
-              return comments._id !== id;
+        else if (type === 'deleteComment') {
+          api.delete(`/posts/${postData._id}/comment/${id}`, { 'Authorization': 'Bearer ' + value })
+            .then(() => {
+              var updatedPost = {
+                ...postData,
+                comments: postData.comments.filter(comments => {
+                  return comments._id !== id;
+                })
+              };
+              this.setState({ postData: updatedPost });
+              updateParentState('updatePost', updatedPost);
             })
-          };
-          this.setState({ postData: updatedPost });
-          updateParentState('updatePost', updatedPost);
-        })
-        .catch(err => {
-          alert("Error deleting comment. Sorry about that!")
-        });
-    }
+            .catch(err => {
+              alert("Error deleting comment. Sorry about that!")
+            });
+        }
+      })
+      .catch(error => {
+        this.props.navigation.navigate('Auth');
+      });
   }
 
   showUserProfile = (user) => {
