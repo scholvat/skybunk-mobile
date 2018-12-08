@@ -1,5 +1,5 @@
 import React from 'react';
-import Autolink from 'react-native-autolink';
+import AutolinkGIF from '../AutolinkGIF/AutolinkGIF';
 import { View, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Modal, Alert, Dimensions } from 'react-native';
 import Image from 'react-native-scalable-image';
 import { Body, Card, CardItem, Text, Thumbnail, Button, Icon } from 'native-base';
@@ -314,7 +314,7 @@ export default class Post extends React.Component {
 
           <CardItem button onPress={this.onPressPost} style={styles.postContent}>
             <Body>
-              <Autolink text={content} numberOfLines={this.props.maxLines} ellipsizeMode='tail' />
+              <AutolinkGIF text={content} numberOfLines={this.props.maxLines} ellipsizeMode='tail' />
             </Body>
           </CardItem>
 

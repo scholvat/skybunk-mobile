@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Autolink from 'react-native-autolink';
-import { Dimensions, TouchableOpacity, View, Modal } from 'react-native';
+import AutolinkGIF from '../AutolinkGIF/AutolinkGIF';
+import { Dimensions, TouchableOpacity, View, Modal, Image } from 'react-native';
 import {
   Text, Thumbnail, ListItem, Card, CardItem,
   Container, Content, Left, Icon, Button
@@ -125,7 +125,7 @@ export default class Comment extends React.Component {
                 <Text style={styles.textAuthor}>
                   {`${authorName} `}
                 </Text>
-                <Autolink text={content} style={styles.textContent}/>
+                <AutolinkGIF text={content} style={styles.textContent}/>
               </TouchableOpacity>
             </View>
           </CardItem>
