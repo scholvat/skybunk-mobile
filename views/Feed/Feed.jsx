@@ -167,14 +167,8 @@ export default class FeedView extends React.Component {
       .then(() => {
         //this.loadData();
       })
-<<<<<<< HEAD
-      .catch(error => {
-        console.error(error);
-        this.props.navigation.navigate('Auth');
-=======
       .catch(err => {
         alert("Error updating post. Sorry about that!");
->>>>>>> feature-private-data
       });
   }
 
