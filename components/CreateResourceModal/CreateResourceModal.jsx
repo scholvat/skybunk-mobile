@@ -6,6 +6,7 @@ import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures'
 import { ImagePicker, Permissions } from 'expo';
 import Toolbar from './Toolbar/Toolbar'
 import styles from './CreateResourceModalStyle';
+import Poll from '../Poll/Poll'
 
 export default class CreateResourceModal extends React.Component {
 
@@ -150,6 +151,7 @@ export default class CreateResourceModal extends React.Component {
                     onChangeText={this.textUpdate}
                     value={this.state.resourceText}
                   />
+                   <Poll choices={this.state.pollChoices} editing={true}/>
                 </GestureRecognizer>
                 <View style={styles.buttonGroup}>
                   <Button block style={styles.button} onPress={this.saveResource}>
