@@ -150,34 +150,31 @@ export default class FeedView extends React.Component {
         })
       });
     }
+    else if (type === 'deletePost') {
+      return api.delete(`/posts/${postId}`)
+        .then(() => {
+          this.updateState('deletePost', postId);
+        })
+        .catch(err => {
+          alert("Error deleting post. Sorry about that!")
+        });
+    }
+    else if (type === 'editPost') {
+      this.updateState('updatePost', data);
+    }
 
-    AsyncStorage.getItem('@Skybunk:token')
-      .then(value => {
-
-        if (type === 'deletePost') {
-          return api.delete(`/posts/${postId}`, { 'Authorization': 'Bearer ' + value })
-            .then(() => {
-              this.updateState('deletePost', postId);
-            })
-            .catch(err => {
-              alert("Error deleting post. Sorry about that!")
-            });
-        }
-        else if (type === 'editPost') {
-          this.updateState('updatePost', data);
-        }
-
-        api.put(`/posts/${postId}`, { 'Authorization': 'Bearer ' + value }, data)
-          .then(() => {
-            //this.loadData();
-          })
-          .catch(err => {
-            alert("Error updating post. Sorry about that!");
-          });
+    api.put(`/posts/${postId}`, {}, data)
+      .then(() => {
+        //this.loadData();
       })
+<<<<<<< HEAD
       .catch(error => {
         console.error(error);
         this.props.navigation.navigate('Auth');
+=======
+      .catch(err => {
+        alert("Error updating post. Sorry about that!");
+>>>>>>> feature-private-data
       });
   }
 
