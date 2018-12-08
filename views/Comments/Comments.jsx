@@ -104,7 +104,7 @@ export default class CommentsView extends React.Component {
           updateParentState('updatePost', data);
         })
         .catch(err => {
-          console.log(err);
+          console.error(err);
           alert("Error updating post. Sorry about that!");
         });
     }
