@@ -1,6 +1,6 @@
 import React from 'react';
 import Autolink from 'react-native-autolink';
-import { View, ScrollView, TouchableOpacity, Modal, Alert, Dimensions } from 'react-native';
+import { View, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Modal, Alert, Dimensions } from 'react-native';
 import Image from 'react-native-scalable-image';
 import { Body, Card, CardItem, Text, Thumbnail, Button, Icon } from 'native-base';
 import _ from 'lodash';
@@ -36,7 +36,7 @@ export default class Post extends React.Component {
         profilePicture: pic,
       });
     }).catch(error => {
-      console.log(error);
+      console.error(error);
     });
     if (this.props.data.image) {
       ApiClient.get(`/posts/${this.props.data._id}/image`, {}).then(pic => {
@@ -44,7 +44,7 @@ export default class Post extends React.Component {
           image: pic,
         });
       }).catch(error => {
-        console.log(error);
+        console.error(error);
       });
     }
   }
@@ -289,8 +289,7 @@ export default class Post extends React.Component {
                 </View>
                 <View style={styles.headerBody}>
                   <View style={styles.authorDetails}>
-                    <Text>{authorName}</Text>
-                    <Text>{this.props.showTag ? ` ►  ${tags[0]}` : null}</Text>
+                    <Text>{authorName}{this.props.showTag ? ` ►  ${tags[0]}` : null}</Text>
                   </View>
                   <Text note>{createdAt}</Text>
                 </View>
@@ -311,11 +310,13 @@ export default class Post extends React.Component {
           </CardItem>
 
           {this.state.image ? <CardItem style={styles.imageContainer}>
-            <Image
-              style={styles.image}
-              width={Dimensions.get('window').width}
-              source={{ uri: `data:image/png;base64,${this.state.image}` }}
-            />
+            <TouchableWithoutFeedback onPress={this.onPressPost}>
+              <Image
+                style={styles.image}
+                width={Dimensions.get('window').width}
+                source={{ uri: `data:image/png;base64,${this.state.image}` }}
+              />
+            </TouchableWithoutFeedback>
           </CardItem> : null}
 
           <CardItem style={styles.postFooter}>
