@@ -58,110 +58,96 @@ export default class Poll extends React.Component {
     items.push({isAddOption: true})
     return items;
   }
-  
-  renderOption(item){
-    var onPress = () => {
-      if(!this.state.multiSelect && !item.selected){
-        //Figure out if the user has already voted
-        const hasVoted = this.state.choices
-          .reduce((a, b) => ({votes: a.votes.concat(b.votes)}))
-          .votes.includes(this.props.loggedInUser._id)
-        if(hasVoted) return;
-      }
-      item.selected = !item.selected;
-      var totalVotes = this.state.totalVotes
-      if(item.selected && !item.votes.includes(this.props.loggedInUser._id)){
-        //user selected a choice
-        item.votes.push(this.props.loggedInUser._id)
-        totalVotes++;
-      }else if(!item.selected && item.votes.includes(this.props.loggedInUser._id)){
-        //user deselected a choice
-        item.votes.splice(item.votes.indexOf(this.props.loggedInUser._id),1)
-        totalVotes--;
-      }
-      var choices = this.state.choices;
 
-      choices[item.key] = item;
-      this.setState({
-        choices: choices,
-        totalVotes: totalVotes
-      });
+  onPress(item){
+    if(!this.state.multiSelect && !item.selected){
+      //Figure out if the user has already voted
+      const hasVoted = this.state.choices
+        .reduce((a, b) => ({votes: a.votes.concat(b.votes)}))
+        .votes.includes(this.props.loggedInUser._id)
+      if(hasVoted) return;
+    }
+    var totalVotes = this.state.totalVotes
+    if(!item.selected && !item.votes.includes(this.props.loggedInUser._id)){
+      //user selected a choice
+      item.votes.push(this.props.loggedInUser._id)
+      totalVotes++;
+      item.selected = true;
+    }else if(item.selected && item.votes.includes(this.props.loggedInUser._id)){
+      //user deselected a choice
+      item.votes.splice(item.votes.indexOf(this.props.loggedInUser._id),1)
+      totalVotes--;
+      item.selected = false;
     }
 
-    var percentage = (item.votes.length/this.state.totalVotes*100).toFixed();
-    if(isNaN(percentage)) percentage = '0%'
-    else percentage = percentage + '%'
+    var choices = this.state.choices;
 
-    const color = item.selected ? '#57b947' : '#D3D3D3';
-    return (
-      <TouchableOpacity onPress={onPress}>
-          <View style={styles.choice}>
-            <View style={[styles.progressBar, {width: percentage, backgroundColor: color}]}/>
-            <Text style={styles.choiceText}>{item.text}</Text>
-            <Text style={styles.choiceText}>({item.votes.length}) {percentage}</Text>
-          </View>
-      </TouchableOpacity>
-    );
+    choices[item.key] = item;
+    this.setState({
+      choices: choices,
+      totalVotes: totalVotes
+    });
   }
 
-  renderAddOption(){
-    return (
-      <View>
-          <View style={styles.choice}>
-            <TextInput style={[styles.choiceText, {flex:1}]}/>
-          </View>
-      </View>
-    );
-  }
+  onChange(item, text){
+    var choices = this.state.choices;
 
-  renderEditableOption(){
+    //Keep track of previously saved choice to detect if text has changed
+    if(!item.previousSavedText) item.previousSavedText = item.text;
+    item.text = text;
 
+    choices[item.key] = item;
+    this.setState({
+      choices: choices
+    });
   }
 
   renderListItem = ({ item }) => {
-    if(item.isAddOption) return this.renderAddOption();
-    var onPress = () => {
-      if(!this.state.multiSelect && !item.selected){
-        //Figure out if the user has already voted
-        const hasVoted = this.state.choices
-          .reduce((a, b) => ({votes: a.votes.concat(b.votes)}))
-          .votes.includes(this.props.loggedInUser._id)
-        if(hasVoted) return;
-      }
-      item.selected = !item.selected;
-      var totalVotes = this.state.totalVotes
-      if(item.selected && !item.votes.includes(this.props.loggedInUser._id)){
-        //user selected a choice
-        item.votes.push(this.props.loggedInUser._id)
-        totalVotes++;
-      }else if(!item.selected && item.votes.includes(this.props.loggedInUser._id)){
-        //user deselected a choice
-        item.votes.splice(item.votes.indexOf(this.props.loggedInUser._id),1)
-        totalVotes--;
-      }
-      var choices = this.state.choices;
-
-      choices[item.key] = item;
-      this.setState({
-        choices: choices,
-        totalVotes: totalVotes
-      });
-    }
-
     var percentage = (item.votes.length/this.state.totalVotes*100).toFixed();
     if(isNaN(percentage)) percentage = '0%'
     else percentage = percentage + '%'
-
     const color = item.selected ? '#57b947' : '#D3D3D3';
-    return (
-      <TouchableOpacity onPress={onPress}>
-          <View style={styles.choice}>
-            <View style={[styles.progressBar, {width: percentage, backgroundColor: color}]}/>
-            <Text style={styles.choiceText}>{item.text}</Text>
-            <Text style={styles.choiceText}>({item.votes.length}) {percentage}</Text>
-          </View>
-      </TouchableOpacity>
-    );
+    if(!this.props.editing){
+      return (
+        <TouchableOpacity onPress={onPress}>
+            <View style={styles.choice}>
+              <View style={[styles.progressBar, {width: percentage, backgroundColor: color}]}/>
+              <Text style={styles.choiceText}>{item.text}</Text>
+              <Text style={styles.choiceText}>({item.votes.length}) {percentage}</Text>
+            </View>
+        </TouchableOpacity>
+      );
+    }else if(item.isAddOption){
+      return (
+        <View>
+            <View style={styles.choice}>
+              <TextInput style={[styles.choiceText, {flex:1}]}/>
+              <Icon style={{color: '#fc4970'}} type='Feather' name='plus-square' />
+            </View>
+        </View>
+      );
+    }else if(item.previousSavedText && item.previousSavedText != item.text){
+      return (
+        <View>
+            <View style={styles.choice}>
+              <View style={[styles.progressBar, {width: percentage, backgroundColor: color}]}/>
+              <TextInput style={[styles.choiceText, {flex:1}]} value={item.text} onChangeText={text => {this.onChange(item, text)}}/>
+              <Icon style={{color: '#fc4970'}} type='Feather' name='rotate-ccw' />
+              <Icon style={{color: '#fc4970'}} type='Feather' name='plus-square' />
+            </View>
+        </View>
+      );
+    }else{
+      return (
+        <View>
+            <View style={styles.choice}>
+              <View style={[styles.progressBar, {width: percentage, backgroundColor: color}]}/>
+              <TextInput style={[styles.choiceText, {flex:1}]} value={item.text} onChangeText={text => {this.onChange(item, text)}}/>
+              <Icon style={{color: '#fc4970'}} type='Feather' name='minus-square' />
+            </View>
+        </View>
+      );
+    }
   }
 
   render() {
