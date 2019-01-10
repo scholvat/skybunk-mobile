@@ -334,7 +334,7 @@ export default class Post extends React.Component {
               />
             </TouchableWithoutFeedback>
           </CardItem> : null}
-          <Poll choices={this.state.pollChoices} loggedInUser={this.props.loggedInUser}/>
+          <Poll editing={true} choices={this.state.pollChoices} loggedInUser={this.props.loggedInUser}/>
 
           <CardItem style={styles.postFooter}>
             <View style={styles.footerContainer}>

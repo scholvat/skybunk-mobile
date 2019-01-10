@@ -55,7 +55,7 @@ export default class Poll extends React.Component {
       return choice;
     });
     items = this.sortChoices(items);
-    items.push({isAddOption: true})
+    if(this.props.editing) items.push({isAddOption: true})
     return items;
   }
 
@@ -103,21 +103,7 @@ export default class Poll extends React.Component {
   }
 
   renderListItem = ({ item }) => {
-    var percentage = (item.votes.length/this.state.totalVotes*100).toFixed();
-    if(isNaN(percentage)) percentage = '0%'
-    else percentage = percentage + '%'
-    const color = item.selected ? '#57b947' : '#D3D3D3';
-    if(!this.props.editing){
-      return (
-        <TouchableOpacity onPress={onPress}>
-            <View style={styles.choice}>
-              <View style={[styles.progressBar, {width: percentage, backgroundColor: color}]}/>
-              <Text style={styles.choiceText}>{item.text}</Text>
-              <Text style={styles.choiceText}>({item.votes.length}) {percentage}</Text>
-            </View>
-        </TouchableOpacity>
-      );
-    }else if(item.isAddOption){
+    if(item.isAddOption){
       return (
         <View>
             <View style={styles.choice}>
@@ -125,6 +111,23 @@ export default class Poll extends React.Component {
               <Icon style={{color: '#fc4970'}} type='Feather' name='plus-square' />
             </View>
         </View>
+      );
+    }
+
+    var percentage = (item.votes.length/this.state.totalVotes*100).toFixed();
+    if(isNaN(percentage)) percentage = '0%'
+    else percentage = percentage + '%'
+    const color = item.selected ? '#57b947' : '#D3D3D3';
+    
+    if(!this.props.editing){
+      return (
+        <TouchableOpacity onPress={() => {this.onPress(item)}}>
+            <View style={styles.choice}>
+              <View style={[styles.progressBar, {width: percentage, backgroundColor: color}]}/>
+              <Text style={styles.choiceText}>{item.text}</Text>
+              <Text style={styles.choiceText}>({item.votes.length}) {percentage}</Text>
+            </View>
+        </TouchableOpacity>
       );
     }else if(item.previousSavedText && item.previousSavedText != item.text){
       return (
