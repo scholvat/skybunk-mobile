@@ -24,7 +24,7 @@ export default class Poll extends React.Component {
     this.state = {
       choices : props.choices,
       totalVotes: totalVotes,
-      multiSelect: false,
+      multiSelect: props.multiSelect,
     }
   }
 

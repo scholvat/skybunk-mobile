@@ -285,7 +285,7 @@ export default class Post extends React.Component {
 
     var numComments = comments ? comments.length : 0;
     var likes = likes ? likes : 0;
-
+    console.log(this.props.data.poll)
     return (
       <View>
         <Card style={styles.card}>
@@ -334,7 +334,7 @@ export default class Post extends React.Component {
               />
             </TouchableWithoutFeedback>
           </CardItem> : null}
-          <Poll editing={true} choices={this.state.pollChoices} loggedInUser={this.props.loggedInUser}/>
+          {this.props.data.poll ? <Poll editing={false} multiselect={this.props.data.poll.isMultiSelect} choices={this.props.data.poll.choices} loggedInUser={this.props.loggedInUser}/>: null}
 
           <CardItem style={styles.postFooter}>
             <View style={styles.footerContainer}>
