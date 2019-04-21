@@ -285,7 +285,6 @@ export default class Post extends React.Component {
 
     var numComments = comments ? comments.length : 0;
     var likes = likes ? likes : 0;
-    console.log(this.props.data.poll)
     return (
       <View>
         <Card style={styles.card}>

@@ -6,16 +6,16 @@ export default (styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    backgroundColor: '#00000050'
+    backgroundColor: '#00000050',
+    minHeight: height*0.3
   },
   view: {
     width: width,
-    height: 330,
     backgroundColor: '#DDDDDD',
   },
   textBox: {
     width: width-10,
-    height: 200,
+    height: 150,
     backgroundColor: '#FFFFFF',
     paddingTop: 5,
     borderRadius: 4,

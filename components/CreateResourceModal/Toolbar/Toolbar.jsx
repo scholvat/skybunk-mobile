@@ -15,7 +15,10 @@ export default function(props) {
 			  <TouchableOpacity onPress={props.createPoll}>
 			<Icon style={styles.icon} type='MaterialIcons' name='poll' />
 		  	</TouchableOpacity>
-		  	{props.image ? <Thumbnail square source={{ uri: props.image }} style={styles.image}/> : null }
+			  {props.image ? <Thumbnail square source={{ uri: props.image }} style={styles.image}/> : null }
+			<TouchableOpacity onPress={props.closeModal} style={styles.closeButton}>
+				<Icon style={styles.icon} type='MaterialIcons' name='close' />
+		  	</TouchableOpacity>
 		</View>
 	);
 }

@@ -23,6 +23,7 @@ export default class Poll extends React.Component {
 
     this.state = {
       choices : props.choices,
+      addOptionText: '',
       totalVotes: totalVotes,
       multiSelect: props.multiSelect,
     }
@@ -48,14 +49,18 @@ export default class Poll extends React.Component {
   }
 
   buildListItems() {
-    if(!this.state.choices) return [];
-
-    items = this.state.choices.map(choice => {
-      choice.key = this.state.choices.indexOf(choice);
-      return choice;
-    });
-    items = this.sortChoices(items);
-    if(this.props.editing) items.push({isAddOption: true})
+    if(!this.state.choices){
+      items = [];
+    }
+    else{
+      items = this.state.choices.map(choice => {
+        choice.key = this.state.choices.indexOf(choice).toString();
+        return choice;
+      });
+      items = this.sortChoices(items);
+    }
+    
+    if(this.props.editing) items.push({key:'', isAddOption: true})
     return items;
   }
 
@@ -102,13 +107,52 @@ export default class Poll extends React.Component {
     });
   }
 
+  addItem(){
+    newChoices = this.state.choices ? this.state.choices : []
+    newChoices.push({'text':this.state.addOptionText, 'votes':[]})
+    this.setState({
+      choices: newChoices,
+      addOptionText: ''
+    })
+  }
+
+  onUndo(item){
+    var choices = this.state.choices;
+    item.text = item.previousSavedText;
+
+    choices[item.key] = item;
+    this.setState({
+      choices: choices
+    });
+  }
+  onConfirmChange(item){
+    var choices = this.state.choices;
+    item.previousSavedText = item.text;
+
+    choices[item.key] = item;
+    this.setState({
+      choices: choices
+    });
+  }
+  onRemoveChoice(item){
+    this.setState({
+      choices: this.state.choices.splice(item.key+1)
+    });
+  }
+
   renderListItem = ({ item }) => {
     if(item.isAddOption){
       return (
         <View>
             <View style={styles.choice}>
-              <TextInput style={[styles.choiceText, {flex:1}]}/>
+              <TextInput 
+                value = {this.state.addOptionText} 
+                style={[styles.choiceText, {flex:1}]} 
+                onChangeText={(text) => this.setState({addOptionText: text})}
+              />
+              <TouchableOpacity onPress={() => {this.addItem()}}>
               <Icon style={{color: '#fc4970'}} type='Feather' name='plus-square' />
+              </TouchableOpacity>
             </View>
         </View>
       );
@@ -129,28 +173,35 @@ export default class Poll extends React.Component {
             </View>
         </TouchableOpacity>
       );
-    }else if(item.previousSavedText && item.previousSavedText != item.text){
-      return (
-        <View>
-            <View style={styles.choice}>
-              <View style={[styles.progressBar, {width: percentage, backgroundColor: color}]}/>
-              <TextInput style={[styles.choiceText, {flex:1}]} value={item.text} onChangeText={text => {this.onChange(item, text)}}/>
-              <Icon style={{color: '#fc4970'}} type='Feather' name='rotate-ccw' />
-              <Icon style={{color: '#fc4970'}} type='Feather' name='plus-square' />
-            </View>
-        </View>
-      );
-    }else{
-      return (
-        <View>
-            <View style={styles.choice}>
-              <View style={[styles.progressBar, {width: percentage, backgroundColor: color}]}/>
-              <TextInput style={[styles.choiceText, {flex:1}]} value={item.text} onChangeText={text => {this.onChange(item, text)}}/>
-              <Icon style={{color: '#fc4970'}} type='Feather' name='minus-square' />
-            </View>
-        </View>
-      );
     }
+    choiceEditted = item.previousSavedText && item.previousSavedText != item.text
+      return (
+        <View>
+            <View style={styles.choice}>
+              <View style={[styles.progressBar, {width: percentage, backgroundColor: color}]}/>
+              <TextInput 
+                style={[styles.choiceText, {flex:1}]} 
+                value={item.text} 
+                onChangeText={text => {this.onChange(item, text)}}
+              />
+              {choiceEditted ?
+                <View>
+                  <TouchableOpacity onPress={() => {this.onUndo(item)}}>
+                    <Icon style={{color: '#fc4970'}} type='Feather' name='rotate-ccw' />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => {this.onConfirmChange(item)}}>
+                    <Icon style={{color: '#fc4970'}} type='Feather' name='plus-square' />
+                  </TouchableOpacity>
+                </View> :
+                <View>
+                  <TouchableOpacity onPress={() => {this.onRemoveChoice(item)}}>
+                    <Icon style={{color: '#fc4970'}} type='Feather' name='minus-square' />
+                  </TouchableOpacity>
+                </View>
+              }
+            </View>
+        </View>
+      );
   }
 
   render() {

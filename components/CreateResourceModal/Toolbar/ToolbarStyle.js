@@ -14,5 +14,10 @@ export default (styles = StyleSheet.create({
     marginTop: 5,
     height:20,
     width:20,
+  },
+  closeButton: {
+    flexGrow: 1, 
+    justifyContent: 'flex-end', 
+    flexDirection: 'row'
   }
 }));

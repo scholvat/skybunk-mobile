@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, Modal, TouchableOpacity, KeyboardAvoidingView, Keyboard, Platform } from 'react-native';
+import { View, Modal, TouchableOpacity, KeyboardAvoidingView, Keyboard, Platform, ScrollView} from 'react-native';
 import { Text, Button, Textarea, Icon } from 'native-base';
 import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures';
 import { ImagePicker, Permissions } from 'expo';
@@ -16,7 +16,9 @@ export default class CreateResourceModal extends React.Component {
 
     this.state = {
       resourceText: existingText || "",
-      image: null
+      image: null,
+      poll: null,
+      visible: false
     };
   }
 
@@ -102,6 +104,12 @@ export default class CreateResourceModal extends React.Component {
     });
   }
 
+  createPoll = async () => {
+    console.log("create poll")
+    this.setState({
+      poll: {'choices':[], 'isMultiSelect':false}
+    })
+  }
   render() {
     var {
       onClose,
@@ -122,12 +130,14 @@ export default class CreateResourceModal extends React.Component {
           activeOpacity={1}
           style={styles.modal}
           onPress={onClose}
-        >
+        />
           <KeyboardAvoidingView
             behavior='padding'
             // Android already does this by default, so it doubles the padding when enabled
             enabled={Platform.OS !== 'android'}
+            style={{backgroundColor: '#DDDDDD'}}
           >
+          <ScrollView >
             <GestureRecognizer
               onSwipeDown={this.hideKeyboard}
               style={styles.gestureRecognizer}
@@ -137,6 +147,8 @@ export default class CreateResourceModal extends React.Component {
                   Toolbar({
                     pickImage: this.pickImage,
                     takeImage: this.takeImage,
+                    createPoll: this.createPoll,
+                    closeModal: onClose,
                     image: this.state.image,
                   }) : null}
                 {/* A bit hacky, but we need another GestureRecognizer to register swipe over the text box */}
@@ -151,6 +163,7 @@ export default class CreateResourceModal extends React.Component {
                     onChangeText={this.textUpdate}
                     value={this.state.resourceText}
                   />
+                  {this.state.poll ? <Poll editing={true} /> : null}
                 </GestureRecognizer>
                 <View style={styles.buttonGroup}>
                   <Button block style={styles.button} onPress={this.saveResource}>
@@ -162,8 +175,9 @@ export default class CreateResourceModal extends React.Component {
                 </View>
               </View>
             </GestureRecognizer>
+            </ScrollView>
           </KeyboardAvoidingView>
-        </TouchableOpacity>
+        
       </Modal>
     )
   }
