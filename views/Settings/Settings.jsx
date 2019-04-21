@@ -1,9 +1,9 @@
 import React from 'react';
-import { AsyncStorage, TouchableOpacity, ImageBackground, Dimensions, Text } from 'react-native';
+import {TouchableOpacity, ImageBackground, Dimensions, Text } from 'react-native';
 import { Container, Content, View, List, ListItem } from 'native-base';
 
 import styles from './SettingsStyle';
-import api from '../../ApiClient';
+import ApiClient from '../../ApiClient';
 import {clearCache} from '../../helpers/imageCache'
 
 export default class SettingsView extends React.Component {
@@ -24,10 +24,15 @@ export default class SettingsView extends React.Component {
   showMemberList = () => {
     this.props.navigation.navigate('MemberList');
   }
+
+  showDonInfo = () => {
+    const user = this.props.navigation.getParam('user');
+    this.props.navigation.navigate('DonInfo', { user });
+  }
   
   logout = () => {
     clearCache();
-    AsyncStorage.removeItem('@Skybunk:token').then(() => {
+    ApiClient.clearAuthToken().then(() => {
       this.props.navigation.navigate('Auth');
     })
       .catch(error => {
@@ -50,6 +55,12 @@ export default class SettingsView extends React.Component {
             <ListItem style={{ margin: 0 }}>
               <TouchableOpacity style={styles.itemContainer} onPress={this.showMemberList}>
                 <Text style={styles.itemText}>Members</Text>
+              </TouchableOpacity>
+            </ListItem>
+
+            <ListItem style={{ margin: 0 }}>
+              <TouchableOpacity style={styles.itemContainer} onPress={this.showDonInfo}>
+                <Text style={styles.itemText}>Find A Don</Text>
               </TouchableOpacity>
             </ListItem>
 

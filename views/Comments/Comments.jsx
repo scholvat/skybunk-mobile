@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, AsyncStorage } from 'react-native';
+import { ScrollView} from 'react-native';
 import { Container, Footer, Content, Text, Spinner } from 'native-base';
 import { Font } from "expo";
 
@@ -7,7 +7,7 @@ import Post from '../../components/Post/Post';
 import Comment from '../../components/Comment/Comment';
 import ContentBar from '../../components/ContentBar/ContentBar';
 import UserProfile from '../../components/UserProfile/UserProfile.jsx';
-import api from '../../ApiClient';
+import ApiClient from '../../ApiClient';
 import style from './CommentsStyle';
 import _ from 'lodash'
 
@@ -68,12 +68,8 @@ export default class CommentsView extends React.Component {
 
     var postUri = `/posts/${postData._id}`;
 
-    await api.get(postUri)
+    await ApiClient.get(postUri, {authorized: true})
       .then(response => {
-        if (response.usersLiked.find(user => user._id === loggedInUser._id)) {
-          response.isLiked = true;
-        } else response.isLiked = false;
-
         this.setState({ postData: response });
 
         // Ensure feed view is up-to-date with current:
@@ -97,8 +93,20 @@ export default class CommentsView extends React.Component {
     const loggedInUser = this.props.navigation.getParam('loggedInUser');
     const updateParentState = navigation.getParam('updateParentState');
 
-    if (['toggleLike', 'editPost'].includes(type)) {
-      api.put(`/posts/${postData._id}`,{}, data)
+    if (['editPost'].includes(type)) {
+      ApiClient.put(`/posts/${postData._id}`, _.pick(data, ['content', 'image']), {authorized: true})
+        .then(() => {
+          this.setState({ postData: data });
+          updateParentState('updatePost', data);
+        })
+        .catch(err => {
+          console.error(err);
+          alert("Error updating post. Sorry about that!");
+        });
+    }
+
+    else if (['toggleLike'].includes(type)) {
+      ApiClient.post(`/posts/${postData._id}/like`, {'addLike': data.isLiked}, {authorized: true})
         .then(() => {
           this.setState({ postData: data });
           updateParentState('updatePost', data);
@@ -110,7 +118,7 @@ export default class CommentsView extends React.Component {
     }
 
     else if (type === 'deletePost') {
-      api.delete(`/posts/${postData._id}`)
+      ApiClient.delete(`/posts/${postData._id}`, {authorized: true})
         .then(() => {
           updateParentState('deletePost', postData._id);
         })
@@ -125,7 +133,7 @@ export default class CommentsView extends React.Component {
         author: loggedInUser._id,
         content: data.content,
       }
-      api.post(`/posts/${postData._id}/comment`, commentContent)
+      ApiClient.post(`/posts/${postData._id}/comment`, commentContent, {authorized: true})
         .then(() => {
           this.loadData();
         })
@@ -139,7 +147,7 @@ export default class CommentsView extends React.Component {
         author: loggedInUser._id,
         content: data.content,
       }
-      api.put(`/posts/${postData._id}/comment/${id}`, commentContent)
+      ApiClient.put(`/posts/${postData._id}/comment/${id}`, commentContent, {authorized: true})
         .then(() => {
           var updatedPost = {
             ...postData,
@@ -157,7 +165,7 @@ export default class CommentsView extends React.Component {
     }
 
     else if (type === 'deleteComment') {
-      api.delete(`/posts/${postData._id}/comment/${id}`)
+      ApiClient.delete(`/posts/${postData._id}/comment/${id}`, {authorized: true})
         .then(() => {
           var updatedPost = {
             ...postData,
@@ -169,6 +177,7 @@ export default class CommentsView extends React.Component {
           updateParentState('updatePost', updatedPost);
         })
         .catch(err => {
+          console.error(err)
           alert("Error deleting comment. Sorry about that!")
         });
     }
@@ -228,7 +237,7 @@ export default class CommentsView extends React.Component {
               maxLines={1000}
               updatePost={this.updateResource}
               enableEditing={enablePostEditing}
-              enableDeleting={loggedInUser.isAdmin}
+              enableDeleting={ loggedInUser.role && loggedInUser.role.includes("admin")}
               loggedInUser={loggedInUser}
               showUserProfile={this.showUserProfile}
               showFullDate={true}
@@ -245,7 +254,7 @@ export default class CommentsView extends React.Component {
                         data={comment}
                         updateComment={this.updateResource}
                         enableEditing={enableCommentEditing}
-                        enableDeleting={loggedInUser.isAdmin}
+                        enableDeleting={ loggedInUser.role && loggedInUser.role.includes("admin")}
                         showUserProfile={this.showUserProfile}
                       />
                     )

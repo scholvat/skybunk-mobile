@@ -1,14 +1,18 @@
 import { Cache } from "react-native-cache";
 import ApiClient from '../ApiClient';
-import {AsyncStorage} from 'react-native';
+import {AsyncStorage, MemoryStore, Platform} from 'react-native';
 import date from 'date-fns';
+
+var backend
+if(Platform.OS == 'android') backend = MemoryStore
+else backend = AsyncStorage
 
 const profilePicCache = new Cache({
 	namespace: "skybunk-profile-pictures",
 	policy: {
 		maxEntries: 30
 	},
-	backend: AsyncStorage
+	backend: backend
 });
 
 const postPicCache = new Cache({
@@ -16,7 +20,7 @@ const postPicCache = new Cache({
 	policy: {
 		maxEntries: 15
 	},
-	backend: AsyncStorage
+	backend: backend
 });
 
 module.exports = {
@@ -26,9 +30,9 @@ module.exports = {
 			profilePicCache.getItem(userID, function(err, cachedPic) {
 				if(err){
 					reject(err);
-				}else if(!cachedPic || !cachedPic.image || date.differenceInHours(new Date(),cachedPic.timeFetched)>2){
-					//cache miss, or over 2 hours old, so go fetch a new copy
-					ApiClient.get(`/users/${userID}/profilePicture`, {}).then(pic => {
+				}else if(!cachedPic || !cachedPic.image || date.differenceInHours(new Date(),cachedPic.timeFetched)>24){
+					//cache miss, or over 24 hours old, so go fetch a new copy
+					ApiClient.get(`/users/${userID}/profilePicture`, {authorized: true}).then(pic => {
 
 						//save fetched item to cache
 						profilePicCache.setItem(userID, {timeFetched: new Date(), image: pic}, function(err) {
@@ -52,10 +56,10 @@ module.exports = {
 		return new Promise(function(resolve, reject) {
 			ApiClient.uploadPhoto(
 				`/users/${userID}/profilePicture`,
-				{},
 				pictureURI,
-				'profilePicture'
-			)
+				'profilePicture',
+				{authorized: true}
+			  )
 				.then(pic => {
 					profilePicCache.setItem(userID, {timeFetched: new Date(), image: pic}, err => {
 						if(err){
@@ -76,9 +80,9 @@ module.exports = {
 			postPicCache.getItem(postID, function(err, cachedPic) {
 				if(err){
 					reject(err);
-				}else if(!cachedPic || !cachedPic.image || date.differenceInHours(new Date(),cachedPic.timeFetched)>2){
-					//cache miss, or over 2 hours old, so go fetch a new copy
-					ApiClient.get(`/posts/${postID}/image`, {}).then(pic => {
+				}else if(!cachedPic || !cachedPic.image || date.differenceInHours(new Date(),cachedPic.timeFetched)>24){
+					//cache miss, or over 24 hours old, so go fetch a new copy
+					ApiClient.get(`/posts/${postID}/image`, {authorized: true}).then(pic => {
 
 						//save fetched item to cache
 						postPicCache.setItem(postID, {timeFetched: new Date(), image: pic}, function(err) {
@@ -102,11 +106,10 @@ module.exports = {
 		return new Promise(function(resolve, reject) {
 			ApiClient.uploadPhoto(
 				`/posts/${postID}/image`,
-				{},
 				pictureURI,
 				'image',
-				'POST'
-				).then(pic => {
+				{authorized: true, method: 'POST'}
+			  ).then(pic => {
 					postPicCache.setItem(postID, {timeFetched: new Date(), image: pic}, err => {
 						if(err){
 							reject(err)
@@ -122,11 +125,14 @@ module.exports = {
 	},
 	clearCache: function(){
 		return new Promise(function(resolve, reject) {
-			profilePicCache.clearAll(function(err) {
+			profilePicCache.clearAll(err => {
 				if(err){
-					resolve();
-				}else{
 					reject(err);
+				}else{
+					postPicCache.clearAll(err => {
+						if(err) reject(err);
+						resolve();
+					})
 				}
 			});
 		});

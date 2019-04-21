@@ -153,18 +153,6 @@ export default class FeedView extends React.Component {
     else if (type === 'editPost') {
       this.updateState('updatePost', data);
     }
-    else if (type === 'deletePost') {
-      return api.delete(`/posts/${postId}`)
-        .then(() => {
-          this.updateState('deletePost', postId);
-        })
-        .catch(err => {
-          alert("Error deleting post. Sorry about that!")
-        });
-    }
-    else if (type === 'editPost') {
-      this.updateState('updatePost', data);
-    }
 
     ApiClient.put(`/posts/${postId}`, _.pick(data, ['content', 'image']), {authorized: true})
       .then(() => {

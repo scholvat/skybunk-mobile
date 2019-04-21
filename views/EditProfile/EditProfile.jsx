@@ -1,10 +1,9 @@
 import React from 'react';
-import { View, TouchableOpacity, KeyboardAvoidingView, Keyboard, AsyncStorage } from 'react-native';
+import { View, TouchableOpacity, KeyboardAvoidingView, ScrollView, Keyboard} from 'react-native';
 import { Icon, Item, Text, Input, Textarea, Spinner } from 'native-base';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import _ from 'lodash';
-
-import api from '../../ApiClient';
+import ApiClient from '../../ApiClient';
 import styles from './EditProfileStyle';
 
 export default class EditProfile extends React.Component {
@@ -64,6 +63,7 @@ export default class EditProfile extends React.Component {
       program: _.get(user, 'info.program', undefined),
       address: _.get(user, 'info.address', undefined),
       affiliation: _.get(user, 'info.affiliation', undefined),
+      phone: _.get(user, 'info.phone', undefined),
       bio: _.get(user, 'info.bio', undefined),
       avoidKeyboard: false,
     }
@@ -83,7 +83,7 @@ export default class EditProfile extends React.Component {
     this.props.navigation.setParams({ saveState: 'saving' });
 
     try {
-      let result = await api.put(`/users/${user._id}`, {}, userData);
+      let result = await ApiClient.put(`/users/${user._id}`, userData, {authorized: true});
 
       this.props.navigation.setParams({ saveState: 'saved' });
 
@@ -101,6 +101,7 @@ export default class EditProfile extends React.Component {
       program,
       address,
       affiliation,
+      phone,
       bio
     } = this.state;
 
@@ -116,6 +117,7 @@ export default class EditProfile extends React.Component {
     if (program) user.info.program = program;
     if (address) user.info.address = address;
     if (affiliation) user.info.affiliation = affiliation;
+    if (phone) user.info.phone = phone;
     if (bio) user.info.bio = bio;
 
     return user;
@@ -175,6 +177,7 @@ export default class EditProfile extends React.Component {
 
   render() {
     return (
+      <ScrollView>
       <KeyboardAvoidingView
         behavior='position'
         enabled={this.state.avoidKeyboard}
@@ -188,9 +191,11 @@ export default class EditProfile extends React.Component {
           {this.generateFieldJSX('program', 'Program', 'What are you studying?')}
           {this.generateFieldJSX('address', 'Room Number / Address', 'Where can you be found?')}
           {this.generateFieldJSX('affiliation', 'Affiliation with Grebel', 'i.e. Resident')}
+          {this.generateFieldJSX('phone', 'Phone Number', 'Let others contact you')}
           {this.generateFieldJSX('bio', 'Bio', 'Share something about yourself')}
         </GestureRecognizer>
       </KeyboardAvoidingView>
+      </ScrollView>
     )
   }
 }

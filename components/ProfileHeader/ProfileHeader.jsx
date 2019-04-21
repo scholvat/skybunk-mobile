@@ -3,7 +3,6 @@ import { Alert, Text, View, Image, TouchableOpacity, ImageBackground, Platform, 
 import { Icon } from "native-base"
 import { ImagePicker, Permissions } from 'expo';
 import styles from "./ProfileHeaderStyle";
-import ApiClient from '../../ApiClient';
 import config from '../../config';
 import {getProfilePicture, setProfilePicture} from '../../helpers/imageCache'
 
@@ -94,7 +93,11 @@ export default class ProfileHeader extends React.Component {
     });
 
     if (!result.cancelled) {
-      setProfilePicture(this.props.user._id, result.uri).then(pic => {
+      setProfilePicture(
+        this.props.user._id,
+        result.uri
+      )
+        .then(pic => {
           this.setState({
             profilePicture: pic,
           });

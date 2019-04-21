@@ -2,9 +2,9 @@ import React from 'react';
 import { Modal, View, Image, TouchableOpacity } from 'react-native';
 import { Text, Icon, Card, CardItem } from 'native-base';
 import { Font, AppLoading } from "expo";
+import AutoLink from 'react-native-autolink'
 import _ from 'lodash';
 
-import ApiClient from '../../ApiClient';
 import styles from './UserProfileStyle';
 import {getProfilePicture} from '../../helpers/imageCache'
 
@@ -69,13 +69,17 @@ export default class UserProfile extends React.Component {
     let {
       program,
       address,
+      phone,
       affiliation,
     } = this.props.user.info;
+    console.log(this.props.user.username)
 
     return (
       <View style={styles.infoBlock}>
-        {program && <Text style={styles.infoText}>{program}</Text>}
-        {address && <Text style={styles.infoText}>{address}</Text>}
+        {program && <Text style={styles.infoText}>{'Program: ' + program}</Text>}
+        {address && <Text style={styles.infoText}>{'Address: ' + address}</Text>}
+        {phone && <Text style={styles.infoText}>{'Phone:' + phone}</Text>}
+        {this.props.user.username && <Text style={styles.infoText}>{'Username: ' + this.props.user.username}</Text>}
         {affiliation && <Text style={styles.infoText}>{affiliation}</Text>}
       </View>
     )
@@ -89,7 +93,7 @@ export default class UserProfile extends React.Component {
 
     return (
       <View style={styles.bioBlock}>
-        <Text style={styles.infoText}>{bio}</Text>
+        <AutoLink style={styles.infoText} text={bio}/>
       </View>
     )
   }
