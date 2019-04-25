@@ -10,6 +10,7 @@ import Popover from 'react-native-popover-view';
 import {getProfilePicture, getPostPicture} from "../../helpers/imageCache"
 import CreateResourceModal from '../CreateResourceModal/CreateResourceModal';
 import styles from "./PostStyle";
+import Poll from'../Poll/Poll'
 
 export default class Post extends React.Component {
 
@@ -324,7 +325,13 @@ export default class Post extends React.Component {
               />
             </TouchableWithoutFeedback>
           </CardItem> : null}
-          {this.props.data.poll ? <Poll editing={false} multiselect={this.props.data.poll.isMultiSelect} choices={this.props.data.poll.choices} loggedInUser={this.props.loggedInUser}/>: null}
+          <Poll 
+            visible={this.props.data.poll} 
+            editing={false} 
+            multiselect={this.props.data.poll.isMultiSelect} 
+            choices={this.props.data.poll.choices} 
+            loggedInUser={this.props.loggedInUser}
+          />
 
           <CardItem style={styles.postFooter}>
             <View style={styles.footerContainer}>

@@ -163,7 +163,7 @@ export default class CreateResourceModal extends React.Component {
                     onChangeText={this.textUpdate}
                     value={this.state.resourceText}
                   />
-                  {this.state.poll ? <Poll editing={true} /> : null}
+                {this.props.showToolbar ? <Poll visible={this.state.poll} editing={true} />  : null}
                 </GestureRecognizer>
                 <View style={styles.buttonGroup}>
                   <Button block style={styles.button} onPress={this.saveResource}>

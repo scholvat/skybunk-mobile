@@ -1,15 +1,8 @@
 import React from 'react';
-import Autolink from 'react-native-autolink';
-import { FlatList, View, ScrollView, TouchableOpacity, Modal, Alert, Dimensions, TextInput } from 'react-native';
-import Image from 'react-native-scalable-image';
-import { Body, Card, CardItem, Text, Thumbnail, Button, Icon, Textarea } from 'native-base';
+import { FlatList, View, TouchableOpacity, TextInput } from 'react-native';
+import {Text, Icon} from 'native-base';
 import _ from 'lodash';
 import { Font } from "expo";
-import date, { isThisHour } from 'date-fns';
-import Popover from 'react-native-popover-view';
-
-import CreateResourceModal from '../CreateResourceModal/CreateResourceModal';
-import ApiClient from '../../ApiClient';
 import styles from "./PollStyle";
 
 export default class Poll extends React.Component {
@@ -205,6 +198,9 @@ export default class Poll extends React.Component {
   }
 
   render() {
+    if(!this.props.visible){
+      return null;
+    }
     return (
         <FlatList style={styles.poll}
             data={this.buildListItems()}
