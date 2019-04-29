@@ -4,7 +4,8 @@ primaryColor = "#C1464E"
 
 export default (styles = StyleSheet.create({
   backgroundTheme: {
-    backgroundColor: "#e4e3eb",
+    //backgroundColor: "#e4e3eb",
+    backgroundColor:"#ffffff",
     color: "#000"
   },
   primaryColor: {
@@ -18,5 +19,8 @@ export default (styles = StyleSheet.create({
   },
   primaryBorderColor: {
     borderColor: primaryColor
+  },
+  primaryColorText: {
+    color: primaryColor
   }
 }));

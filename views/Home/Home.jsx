@@ -4,6 +4,7 @@ import { Container, Content, Spinner, Footer, Thumbnail} from 'native-base';
 import ChannelList from "../../components/ChannelList/ChannelList";
 import NotificationList from "../../components/NotificationList/NotificationList";
 import HomeTabBar from "./HomeTabBar/HomeTabBar";
+import WidgetList from "../../components/WidgetList/WidgetList"
 import styles from "./HomeStyle";
 import ApiClient from '../../ApiClient';
 import ImageCache from '../../helpers/imageCache'
@@ -162,24 +163,34 @@ export default class HomeView extends React.Component {
         </Container>
       );
     } else {
-      const hasNewNotifications = this.hasNewNotifications()
+      const hasNewNotifications = this.hasNewNotifications();
+      switch(this.state.currentTab){
+        case 'notifs':
+          var tabJSX = (<NotificationList
+            notifications={this.state.notifications.slice(0, 30)}
+            onPressNotif={this.onPressNotif}
+            markNotifsSeen={this.markNotifsSeen}
+            refreshNotifications={this.refreshNotifications}
+            hasNewNotifications={hasNewNotifications}
+          />);
+          break;
+        case 'widgets':
+          var tabJSX = (<WidgetList />);
+          break;
+        case 'channels':
+        default:
+          var tabJSX = (<ChannelList
+            channels={channels}
+            onPressChannel={this.onPressChannel}
+            user={user}
+          />);
+          break;
+      }
+
       return (
         <Container>
           <Container>
-              {this.state.currentTab === 'channels' ? 
-                <ChannelList
-                  channels={channels}
-                  onPressChannel={this.onPressChannel}
-                  user={user}
-                /> :
-                <NotificationList
-                  notifications={this.state.notifications.slice(0, 30)}
-                  onPressNotif={this.onPressNotif}
-                  markNotifsSeen={this.markNotifsSeen}
-                  refreshNotifications={this.refreshNotifications}
-                  hasNewNotifications={hasNewNotifications}
-                />
-              }
+              {tabJSX}
           </Container>
           <Footer>
             <HomeTabBar 
